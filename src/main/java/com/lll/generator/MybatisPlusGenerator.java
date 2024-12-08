@@ -2,6 +2,7 @@ package com.lll.generator;
 
 import com.baomidou.mybatisplus.generator.AutoGenerator;
 import com.baomidou.mybatisplus.generator.config.*;
+import com.baomidou.mybatisplus.generator.config.po.LikeTable;
 import com.baomidou.mybatisplus.generator.config.querys.MySqlQuery;
 import com.baomidou.mybatisplus.generator.config.rules.DateType;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
@@ -40,8 +41,8 @@ public class MybatisPlusGenerator {
         String projectPath = System.getProperty("user.dir");
         // 模块名
         String moduleName = scanner("请输入模块名（可为空）：");
-        // 表名
-        String[] tableNames = scanner("请输入表名（多个英文逗号隔开，为空生成所有表）：").split(",");
+        //
+        String[] tableNames = scanner("请输入表名（多个表英文逗号隔开，生成模块下的可使用`模块名_*`，为空则生成所有表）：").split(",");
         // 代码生成器
         AutoGenerator autoGenerator = new AutoGenerator(initDataSourceConfig());
         autoGenerator.global(initGlobalConfig(projectPath));
@@ -72,7 +73,11 @@ public class MybatisPlusGenerator {
                 .controllerBuilder()
                 .enableRestStyle()
                 .formatFileName("%sController");
-        if (!tableNames[0].isEmpty()) {
+        if (tableNames[0].contains("*")) {
+            String[] likeStr = tableNames[0].split("_");
+            String likePrefix = likeStr[0] + "_";
+            builder.likeTable(new LikeTable(likePrefix));
+        } else if (!tableNames[0].isEmpty()) {
             builder.addInclude(tableNames);
         }
         return builder.build();
